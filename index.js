@@ -9,7 +9,9 @@ const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
  * IBM CLOUD: Use the following code only to
  * authenticate to IBM Cloud.
  * * * * */
-
+/**
+ * speech to text
+ */
 const { IamAuthenticator } = require('ibm-watson/auth');
 const speechToText = new SpeechToTextV1({
   authenticator: new IamAuthenticator({
@@ -17,6 +19,31 @@ const speechToText = new SpeechToTextV1({
   }),
   serviceUrl: 'https://api.us-south.speech-to-text.watson.cloud.ibm.com/instances/7bf40b64-05cd-4672-ad42-570fc09c73fa',
 });
+/**
+ * natural language understanding
+ */
+const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
+
+const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
+  version: '2021-08-01',
+  authenticator: new IamAuthenticator({
+    apikey: 'nLmydTwLDwW9M0RrzN1FoAajfhO-MoQ454HBRf2-iPAt',
+  }),
+  serviceUrl: 'https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/dd5dd53e-0925-4772-945a-e5f7eeb18eba',
+});
+/**
+ * language translator
+ */
+ const LanguageTranslatorV3 = require('ibm-watson/language-translator/v3');
+ 
+ const languageTranslator = new LanguageTranslatorV3({
+   version: '2018-05-01',
+   authenticator: new IamAuthenticator({
+     apikey: 'KnaSJk4AiMuNwldvuoWOJFMmClDFODj0gZX1N4E-xb2i',
+   }),
+   serviceUrl: 'https://api.us-south.language-translator.watson.cloud.ibm.com/instances/1a6ea051-f892-4b6e-9c00-51e638f97b53',
+ });
+
 
 app.use(
     bodyParser.urlencoded({
@@ -26,7 +53,7 @@ app.use(
 );
 app.use(express.static("public"));
 app.set("view engine","ejs");
-app.listen(8080,function(){
+app.listen(5000,function(){
     console.log("server started");
 });
 var movie = require(__dirname+"/movie");
@@ -81,15 +108,36 @@ app.post("/addComment/:id",function(req,res){
           
           console.log(name, JSON.stringify(event, null, 2));
           if(name=='Data:'){
-            const com =new comment(
-                {
-                    Id: 1,
-                    movieid:req.params.id,
-                    text:event.results[0].alternatives[0].transcript,
+            
+            const analyzeParams = {
+                'features': {
+                    'keywords': {
+                        'sentiment': true,
+                        'emotion': true,
+                        'limit': 3}
+                },
+                'text': event.results[0].alternatives[0].transcript
+              };
+              naturalLanguageUnderstanding.analyze(analyzeParams)
+              .then(analysisResults => {
+                console.log(JSON.stringify(analysisResults, null, 2));
+                if(analysisResults.result.keywords[0].emotion.anger<0.4){
+                    const com =new comment(
+                        {
+                            Id: 1,
+                            movieid:req.params.id,
+                            text:event.results[0].alternatives[0].transcript,
+                        }
+                    );
+                    com.save();   
+                    res.redirect("/showMovie")
                 }
-            );
-            com.save();   
-            res.redirect("/showMovie")
+                
+              })
+              .catch(err => {
+                console.log('error:', err);
+              });
+            
           }
          
       };
