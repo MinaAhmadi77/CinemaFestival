@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="page.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            
+        }
+
+        .movie {
+            width: 60%;
+            border: 1px solid;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: row;
+
+            justify-content: space-around;
+            align-items: center;
+
+        }
+        .movieinfo{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+        }
+        .moviecom{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+           
+        }
+        
+        img{
+            
+            width: 200px;
+            height: 70%;
+           
+        }
+    </style>
+</head>
+
+<body>
+    <% movies.forEach(function(movie){ %>
+        <div class="movie">
+            <div class="moviepic">
+                <img src=<%=movie.poster%>>
+            </div>
+            <div class="movieinfo">
+
+    
+                <p>
+                    <%=movie.name%>
+                </p>
+                <p>
+                    <%=movie.director%>
+                </p>
+    
+               
+            </div>
+            <div class="moviecom">
+                <button ><a href="/addComments/<%=movie.Id%>">add</a></button>
+                <button><a href="/showComments/<%=movie.Id%>">comments</a> </button>
+            </div>
+            
+        </div>
+        <br>
+       
+        <%})%>
+
+</body>
+
+</html>
