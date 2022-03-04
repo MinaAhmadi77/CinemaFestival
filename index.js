@@ -58,14 +58,38 @@ app.listen(5000,function(){
 });
 var movie = require(__dirname+"/movie");
 var comment = require(__dirname+"/comment.js");
-app.get("/showComments/:id",function(req,res){
+
+app.get("/showComments/:id/:lan",function(req,res){
     var id = req.params.id
     comment.find({movieid:id}).exec(function(error,comments){
         if(!error){
-            res.render("comment",{comments:comments})
+           
+            if(req.params.lan==1){
+                const translateParams = {
+                    text: comments[0].text,
+                    modelId: 'en-es',
+                  };
+                  
+                  languageTranslator.translate(translateParams)
+                    .then(translationResult => {
+                      console.log(JSON.stringify(translationResult, null, 2));
+                      res.render("comment",{comments:comments})
+                    })
+                    .catch(err => {
+                      console.log('error:', err);
+                    });
+                
+
+            }
+            
         }
     })
 
+});
+
+app.get("/selectLanguage/:id",function(req,res){
+    res.render("selectLanguage",{id:req.params.id})
+    console.log(req.params.id)
 });
 app.get("/",function(req,res){
     res.render("home")
