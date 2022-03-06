@@ -10,8 +10,8 @@ mongoose.connect(
 
 const commentSchema = new mongoose.Schema(
     {
-        "Id": {
-          "type": "Number"
+        "username": {
+          "type": "String"
         },
         "movieid": {
           "type": "Number"

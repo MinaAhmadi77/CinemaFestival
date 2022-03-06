@@ -4,6 +4,40 @@ const bodyParser = require("body-parser");
 const app = express();
 const fs = require('fs');
 const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
+const formidable = require('formidable');
+const formidableMiddleware = require('express-formidable');
+
+// app.get('/', (req, res) => {
+//     res.send(`
+//       <h2>With <code>"express"</code> npm package</h2>
+//       <form action="/api/upload" enctype="multipart/form-data" method="post">
+//         <div>Text field title: <input type="text" name="title" /></div>
+//         <div>File: <input type="file" name="someExpressFiles" multiple="multiple" /></div>
+//         <input type="submit" value="Upload" />
+//       </form>
+//     `);
+// });
+
+// app.post('/api/upload', (req, res, next) => {
+//     const form = formidable({ multiples: true, uploadDir: __dirname + '/commentfile' });
+
+//     form.parse(req, (err, fields, files) => {
+//         if (err) {
+//             next(err);
+//             return;
+//         }
+//         res.json({ fields, files });
+//         var fs = require('fs');
+//         fs.rename(files.someExpressFiles.filepath, 'D:\\cloud\\CinemaFestival\\commentfile\\' + files.someExpressFiles.originalFilename, function (err) {
+//             if (err) console.log('ERROR: ' + err);
+//         });
+//         console.log(fields)
+//     });
+// });
+
+
+
+
 
 /* * * * *
  * IBM CLOUD: Use the following code only to
@@ -74,39 +108,41 @@ app.get("/showComments/:id/:lan", function (req, res) {
                 text: commentsText,
                 modelId: 'en-es',
             };
-           
+
             if (req.params.lan == 2) {
-                translateParams.modelId='en-es'
-                
+                translateParams.modelId = 'en-es'
+
             }
-            else if(req.params.lan == 3){
-                translateParams.modelId='en-de'
+            else if (req.params.lan == 3) {
+                translateParams.modelId = 'en-de'
             }
 
 
 
-                languageTranslator.translate(translateParams)
-                    .then(translationResult => {
-                        console.log(JSON.stringify(translationResult, null, 2));
-                        for (const trans of translationResult.result.translations){
-                            newComments.push(trans.translation)
-                            
-                        }
-                        if(req.params.lan==1){
-                            newComments=commentsText
-                        }
+            languageTranslator.translate(translateParams)
+                .then(translationResult => {
+                    console.log(JSON.stringify(translationResult, null, 2));
+                    for (const trans of translationResult.result.translations) {
+                        newComments.push(trans.translation)
 
-                        
-                        res.render("comment", { comments: newComments })
+                    }
+                    if (req.params.lan == 1) {
+                        newComments = commentsText
+                    }
+                    var arr=[]
+                    for(var i=0;i<comments.length;i++){
+                        arr.push({comment:newComments[i],username:comments[i].username})
+                    }
+                    res.render("comment", { comments: arr })
 
-                    })
-                    .catch(err => {
-                        console.log('error:', err);
-                    });
+                })
+                .catch(err => {
+                    console.log('error:', err);
+                });
 
 
-            
-        
+
+
 
         }
     })
@@ -117,7 +153,7 @@ app.get("/selectLanguage/:id", function (req, res) {
     res.render("selectLanguage", { id: req.params.id })
     console.log(req.params.id)
 });
-app.get("/", function (req, res) {
+app.get("/t", function (req, res) {
     res.render("home")
 });
 app.get("/addMovie", function (req, res) {
@@ -132,68 +168,85 @@ app.get("/addMovie", function (req, res) {
     mov.save();
 
 });
-app.post("/addComment/:id", function (req, res) {
-    console.log(req.params.id)
-    const params = {
-        objectMode: true,
-        contentType: 'audio/mp3',
-        model: 'en-US_BroadbandModel',
+app.post("/addComment/:id", function (req, res,next) {
 
-        maxAlternatives: 1,
-    };
+    const form = formidable({ multiples: true, uploadDir: __dirname + '/commentfile' });
 
-    // Create the stream.
-    const recognizeStream = speechToText.recognizeUsingWebSocket(params);
-
-    // Pipe in the audio.
-    fs.createReadStream(__dirname + '/commentfile/' + req.body.text).pipe(recognizeStream);
-
-
-    recognizeStream.on('data', function (event) { onEvent('Data:', event); });
-    recognizeStream.on('error', function (event) { onEvent('Error:', event); });
-    recognizeStream.on('close', function (event) { onEvent('Close:', event); });
-
-    // Display events on the console.
-    function onEvent(name, event) {
-
-        console.log(name, JSON.stringify(event, null, 2));
-        if (name == 'Data:') {
-
-            const analyzeParams = {
-                'features': {
-                    'keywords': {
-                        'sentiment': true,
-                        'emotion': true,
-                        'limit': 3
-                    }
-                },
-                'text': event.results[0].alternatives[0].transcript
-            };
-            naturalLanguageUnderstanding.analyze(analyzeParams)
-                .then(analysisResults => {
-                    console.log(JSON.stringify(analysisResults, null, 2));
-                    if (analysisResults.result.keywords[0].emotion.anger < 0.4) {
-                        const com = new comment(
-                            {
-                                Id: 1,
-                                movieid: req.params.id,
-                                text: event.results[0].alternatives[0].transcript,
-                            }
-                        );
-                        com.save();
-                        res.redirect("/showMovie")
-                    }
-
-                })
-                .catch(err => {
-                    console.log('error:', err);
-                });
-
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            next(err);
+            return;
         }
+        console.log(fields)
+        var fs = require('fs');
+        fs.rename(files.text.filepath, __dirname+'/commentfile/' + files.text.originalFilename, function (err) {
+            if (err) console.log('ERROR: ' + err);
+        });
+        
+        
+        console.log(req.params.id)
+        const params = {
+            objectMode: true,
+            contentType: 'audio/mp3',
+            model: 'en-US_BroadbandModel',
 
-    };
+            maxAlternatives: 1,
+        };
 
 
+        // Create the stream.
+        const recognizeStream = speechToText.recognizeUsingWebSocket(params);
+
+        // Pipe in the audio.
+        // fs.createReadStream(__dirname + '/commentfile/' + req.body.text).pipe(recognizeStream);
+        fs.createReadStream(__dirname+'/commentfile/' + files.text.originalFilename).pipe(recognizeStream);
+        recognizeStream.on('data', function (event) { onEvent('Data:', event); });
+        recognizeStream.on('error', function (event) { onEvent('Error:', event); });
+        recognizeStream.on('close', function (event) { onEvent('Close:', event); });
+
+        // Display events on the console.
+        function onEvent(name, event) {
+
+            console.log(name, JSON.stringify(event, null, 2));
+            if (name == 'Data:') {
+
+                const analyzeParams = {
+                    'features': {
+                        'keywords': {
+                            'sentiment': true,
+                            'emotion': true,
+                            'limit': 3
+                        }
+                    },
+                    'text': event.results[0].alternatives[0].transcript
+                };
+                naturalLanguageUnderstanding.analyze(analyzeParams)
+                    .then(analysisResults => {
+                        console.log(JSON.stringify(analysisResults, null, 2));
+                        if (analysisResults.result.keywords[0].emotion.anger < 0.4) {
+                            const com = new comment(
+                                {
+                                    username: fields.movieid,
+                                    movieid: req.params.id,
+                                    text: event.results[0].alternatives[0].transcript,
+                                }
+                            );
+                            com.save();
+                            res.redirect("/showMovie")
+                        }
+                     
+                        
+
+                    })
+                    .catch(err => {
+                        console.log('error:', err);
+                    });
+
+            }
+
+        };
+
+    });
 
 });
 app.get("/addComments/:id", function (req, res) {

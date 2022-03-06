@@ -13,6 +13,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            background-color:  #f4d03f ;
             
         }
 
@@ -22,7 +23,7 @@
             border-radius: 20px;
             display: flex;
             flex-direction: row;
-
+            background-color: aliceblue;
             justify-content: space-around;
             align-items: center;
 
@@ -48,12 +49,34 @@
             height: 70%;
            
         }
+        .t{
+            color: rebeccapurple;
+            font-weight: bold;
+            font-size: 23px;
+        }
+        button{
+            background-color: aliceblue;
+            border: rebeccapurple solid 2px;
+            border-radius: 4px;
+            width: 120px;
+            height: 40px;
+            font-size: 15px;
+            color: rebeccapurple;
+        }
+        .title{
+        font-size: 45px;
+        color: #000;
+        font-weight: 20px;
+        }
     </style>
 </head>
 
 <body>
+    <p class="title">--Cinema Festival--</p>
     <% movies.forEach(function(movie){ %>
+        <hr>
         <div class="movie">
+            
             <div class="moviepic">
                 <img src=<%=movie.poster%>>
             </div>
@@ -61,17 +84,18 @@
 
     
                 <p>
-                    <%=movie.name%>
+                   <div class="t">Movie Name:</div>  <%=movie.name%>
                 </p>
                 <p>
-                    <%=movie.director%>
+                    <div class="t">Director:</div> <%=movie.director%>
                 </p>
     
                
             </div>
             <div class="moviecom">
-                <button ><a href="/addComments/<%=movie.Id%>">add comments</a></button>
-                <button><a href="/selectLanguage/<%=movie.Id%>">show comments</a> </button>
+               <a href="/addComments/<%=movie.Id%>"> <button >add comments</button></a>
+               <hr>
+               <a href="/selectLanguage/<%=movie.Id%>"> <button>show comments</button></a> 
             </div>
             
         </div>

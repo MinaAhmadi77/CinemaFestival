@@ -1,16 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body,
+        html {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: white;
+            height: 100%;
+        }
+
+        button {
+            background-color: #f4d03f;
+            border: rebeccapurple solid 2px;
+            border-radius: 6px;
+            width: 300px;
+            height: 70px;
+            font-size: 20px;
+            color: rebeccapurple;
+        }
+    </style>
 </head>
+
 <body>
- <button><a href="/showComments/<%=id%>/1">add comments</a></button>
- <button><a href="/showComments/<%=id%>/2">add comments</a></button>
- <button><a href="/showComments/<%=id%>/3">add comments</a></button>
- 
-    
+    <strong style="font-size: 28px;color: rebeccapurple;">Select Language</strong>
+    <br>
+    <hr>
+    <a href="/showComments/<%=id%>/1"><button>English</button></a>
+    <hr><hr><hr>
+    <a href="/showComments/<%=id%>/2"><button>Spanish</button></a>
+    <hr><hr><hr>
+    <a href="/showComments/<%=id%>/3"><button>Germany</button></a>
+
+
 </body>
+
 </html>

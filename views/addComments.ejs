@@ -5,12 +5,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body,html{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color:  white ;
+            height: 100%;
+        }
+        
+        .title{
+            font-size: 50px;
+            font-weight: 100px;
+            color: rebeccapurple;
+
+        }
+        input{
+            width: 200px;
+            height: 40px;
+        }
+    </style>
 </head>
 <body>
-    <form action="/addComment/<%=id%>" method="post">
+    <p class="title">add comment</p>
+    <form action="/addComment/<%=id%>" method="post" enctype="multipart/form-data">
+        <span>user name :</span>
         <input  type="text" name="movieid">
-        <input type="file" name="text">
-        <input type="submit" value="add">
+        <br><br>
+        <input type="file" name="text" multiple="multiple">
+        <br><br>
+        <input type="submit" value="upload">
     </form>
 </body>
 </html>

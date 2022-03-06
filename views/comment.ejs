@@ -5,14 +5,46 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color:   #6556d1
+ ;
+        }
+        .user{
+            font-size: 20px;
+            font-weight: bold;
+        }
+        div{
+            
+            width: 60%;
+            border: 1px solid;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            background-color: aliceblue;
+            justify-content: center;
+            align-items: center;
+        }
+        
+    </style>
 </head>
 <body>
     <% comments.forEach(function(comment){ %>
         <div>
-            <p><%=comment%></p>
-        </hr>
+            <span class="user"><%=comment.username%>:</span>
+
+           
+                <p><%=comment.comment%></p>
+            
+        </br>
+        
        
         </div>
+        <hr><hr>
         <%})%>
         
     
